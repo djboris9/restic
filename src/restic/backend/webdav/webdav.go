@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"encoding/xml"
-	"io/ioutil"
 	"restic/backend"
 	"restic/errors"
 )
@@ -264,8 +263,8 @@ func (b *webdavBackend) List(t restic.FileType, done <-chan struct{}) <-chan str
 		return ch
 	}
 
-	content, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(content))
+	//	content, _ := ioutil.ReadAll(resp.Body)
+	//	fmt.Println(string(content))
 
 	var list Multistatus
 	if err = xml.NewDecoder(resp.Body).Decode(&list); err != nil {
@@ -273,12 +272,13 @@ func (b *webdavBackend) List(t restic.FileType, done <-chan struct{}) <-chan str
 		close(ch)
 		return ch
 	}
+	fmt.Println(list)
 
 	go func() {
 		defer close(ch)
-		for _, m := range list.Response {
+		for _, m := range list.Href {
 			select {
-			case ch <- m.HREF:
+			case ch <- m:
 			case <-done:
 				return
 			}
