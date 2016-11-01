@@ -16,6 +16,7 @@ import (
 	"restic/backend/rest"
 	"restic/backend/s3"
 	"restic/backend/sftp"
+	"restic/backend/webdav"
 	"restic/debug"
 	"restic/location"
 	"restic/repository"
@@ -331,6 +332,8 @@ func open(s string) (restic.Backend, error) {
 		be, err = s3.Open(cfg)
 	case "rest":
 		be, err = rest.Open(loc.Config.(rest.Config))
+	case "webdav":
+		be, err = webdav.Open(loc.Config.(webdav.Config))
 	default:
 		return nil, errors.Fatalf("invalid backend: %q", loc.Scheme)
 	}
@@ -371,6 +374,8 @@ func create(s string) (restic.Backend, error) {
 		return s3.Open(cfg)
 	case "rest":
 		return rest.Open(loc.Config.(rest.Config))
+	case "webdav":
+		return webdav.Open(loc.Config.(webdav.Config))
 	}
 
 	debug.Log("invalid repository scheme: %v", s)
